@@ -30,7 +30,7 @@ class Rectangle(object):
 	# TODO: Performance (cpu, ram) (eg. caching)
 	# TODO: Descriptor (?)
 	# TODO: Boolean operations (operators?)
-	# TODO: Normalisations, mapping
+	# TODO: Normalisations (constructor and possibly attribute assignments), mapping
 	# TODO: Use complex for points and vectors (?)
 	# TODO: Coordinate systems (agnostic, or make assumptions?)
 
@@ -43,10 +43,10 @@ class Rectangle(object):
 
 		'''
 
-		self.left   = left
-		self.right  = right
-		self.top    = top
-		self.bottom = bottom
+		self.left   = min(left, right)
+		self.right  = max(left, right)
+		self.top    = min(top, bottom)
+		self.bottom = max(top, bottom)
 
 
 	def hAligned(self, point):
@@ -89,10 +89,10 @@ class Rectangle(object):
 		# TODO: Test graphically
 		# TODO: Refactor (eg. use min with key argument)
 		horizontal = sorted((self.left, self.right, other.left, other.right)) #
-		xOverlap = horizontal[1:3] if (horizontal[0] in (self.left, self.right)) != (horizontal[1] in (self.left, self.right)) else None
+		xOverlap = horizontal[1:3] if min(((self.left, self.right), (other.left, other.right)), key=lambda ln: ln[0]) != tuple(horizontal[:2]) else None
 		
 		vertical = sorted((self.top, self.bottom, other.top, other.bottom)) #
-		yOverlap = vertical[1:3] if (vertical[0] in (self.top, self.bottom)) != (vertical[1] in (self.top, self.bottom)) else None
+		yOverlap = vertical[1:3] if min(((self.top, self.bottom), (other.top, other.bottom)), key=lambda ln: ln[0]) != tuple(vertical[:2]) else None
 
 		if xOverlap == None or yOverlap == None:
 			return None
@@ -113,10 +113,6 @@ class Maybe(object):
 
 
 def main():
-	print(Rectangle(5, 20, 10, 40).intersect(Rectangle(5, 15, 10, 50)))
-	value = Maybe(5).apply(lambda v: v * 2)
-	print(value)
-
 	app = tk.Tk()
 	app.title('Intersections')
 	app.geometry('{0}x{1}'.format(500, 500))
@@ -133,15 +129,17 @@ def main():
 
 	#
 	# TODO: Clean up the input logic (state machine)
-	transaction = { 'count': 0, 'drawing': False }
+	transaction = { 'count': 0, 'drawing': False, 'anchor': None }
 
 	def mousedown(event):
-		transaction['count'] = (transaction['count'] + 1) # % 2 #
-		transaction['drawing'] = True
+		transaction['count']   += 1   #
+		transaction['drawing'] = True #
 
 		r = Rectangle(left=event.x, right=event.x, top=event.y, bottom=event.y)
 		rectangles.append(r) #
 		rects.append(canvas.create_rectangle(r.asTuple(), fill='white', width=1))
+
+		transaction['anchor'] = (event.x, event.y)
 
 		if transaction['count'] == 2:
 			r = rectangles[-2].intersect(rectangles[-1])                                                          # 
@@ -154,8 +152,7 @@ def main():
 
 	def mousemove(event):
 		if transaction['drawing']:
-			rectangles[-1].right  = event.x
-			rectangles[-1].bottom = event.y
+			rectangles[-1] = Rectangle(left=transaction['anchor'][0], top=transaction['anchor'][1], right=event.x, bottom=event.y)
 			canvas.coords(rects[-1], rectangles[-1].asTuple())
 
 			if transaction['count'] == 2:
