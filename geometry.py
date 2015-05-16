@@ -87,6 +87,7 @@ class Rectangle(object):
 
 	def intersect(self, other):
 		# TODO: Test graphically
+		# TODO: Refactor (eg. use min with key argument)
 		horizontal = sorted((self.left, self.right, other.left, other.right)) #
 		xOverlap = horizontal[1:3] if (horizontal[0] in (self.left, self.right)) != (horizontal[1] in (self.left, self.right)) else None
 		
@@ -112,6 +113,7 @@ class Maybe(object):
 
 
 def main():
+	print(Rectangle(5, 20, 10, 40).intersect(Rectangle(5, 15, 10, 50)))
 	value = Maybe(5).apply(lambda v: v * 2)
 	print(value)
 
@@ -122,13 +124,15 @@ def main():
 	canvas = tk.Canvas(width=500, height=500) #
 	canvas.pack()
 
-	rectangles    = [Rectangle(20, 65, 150, 210), Rectangle(34, 87, 120, 200)]
-	intersections = [rectangles[0].intersect(rectangles[1])]
+	rectangles    = []
+	intersections = []
+
 
 	rects = [canvas.create_rectangle((r.left, r.top, r.right, r.bottom), fill='white', width=1) for r in rectangles]
 	inter = [canvas.create_rectangle((r.left, r.top, r.right, r.bottom), fill='orange', width=1) if r is not None else None for r in intersections]
 
 	#
+	# TODO: Clean up the input logic (state machine)
 	transaction = { 'count': 0, 'drawing': False }
 
 	def mousedown(event):
@@ -140,9 +144,9 @@ def main():
 		rects.append(canvas.create_rectangle(r.asTuple(), fill='white', width=1))
 
 		if transaction['count'] == 2:
-			r = rectangles[-2].intersect(rectangles[-1])
-			intersections.append(r) #
-			inter.append(canvas.create_rectangle(r.asTuple(), fill='orange', width=1) if r is not None else None)
+			r = rectangles[-2].intersect(rectangles[-1])                                                          # 
+			intersections.append(r)                                                                               # 
+			inter.append(canvas.create_rectangle(r.asTuple(), fill='orange', width=1) if r is not None else None) # 
 
 	def mouseup(event):
 		transaction['drawing'] = False
@@ -158,7 +162,8 @@ def main():
 				r = rectangles[-2].intersect(rectangles[-1])
 				intersections[-1] = r #
 				if r is None:
-					pass
+					if inter[-1] is not None:
+						canvas.coords(inter[-1], (0,0,0,0))
 				elif inter[-1] is not None:
 					canvas.coords(inter[-1], r.asTuple())
 				else:
