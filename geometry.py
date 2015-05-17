@@ -50,15 +50,23 @@ class Rectangle(object):
 
 
 	def hAligned(self, point):
-		return min(self.left, self.right) <= point.real <= max(self.left, self.right) # Point is horizontally aligned (eg. on or between the left and right edges)
+		return self.left <= point.real <= self.right # Point is horizontally aligned (eg. on or between the left and right edges)
 
 
 	def vAligned(self, point):
-		return min(self.top, self.bottom) <= point.real <= max(self.top, self.bottom) # Point is vertically aligned (eg. on or between the top and bottom edges)
+		return self.top <= point.real <= self.bottom # Point is vertically aligned (eg. on or between the top and bottom edges)
 
 
 	def __in__(self, point):
 		return self.hAligned(point) and self.vAligned(point) # Point is inside the Rectangle
+
+
+	def __str__(self):
+		return 'Rectangle(left={left}, right={right}, top={top}, bottom={bottom})'.format(left=self.left, right=self.right, top=self.top, bottom=self.bottom)
+
+
+	def __eq__(self, other):
+		return self.left == other.left and self.right == other.right and self.top == other.top and self.bottom == other.bottom
 
 
 	def width(self):
@@ -77,6 +85,10 @@ class Rectangle(object):
 		return self.width()+self.height()*1j
 
 
+	def area(self):
+		return self.width()*self.height()
+
+
 	def asDict(self):
 		return { 'left': self.left, 'right': self.right, 'top': self.top, 'bottom': bottom }
 
@@ -86,19 +98,23 @@ class Rectangle(object):
 
 
 	def intersect(self, other):
+		# TODO: Allow multiple rects (?)
 		# TODO: Test graphically
 		# TODO: Refactor (eg. use min with key argument)
-		horizontal = sorted((self.left, self.right, other.left, other.right)) #
-		xOverlap = horizontal[1:3] if min(((self.left, self.right), (other.left, other.right)), key=lambda ln: ln[0]) != tuple(horizontal[:2]) else None
+		# TODO: Performance (eg. short-circuit if overlapX is None)
 		
-		vertical = sorted((self.top, self.bottom, other.top, other.bottom)) #
-		yOverlap = vertical[1:3] if min(((self.top, self.bottom), (other.top, other.bottom)), key=lambda ln: ln[0]) != tuple(vertical[:2]) else None
+		overlapX = overlap(self.left, self.right, other.left, other.right)
+		overlapY = overlap(self.top,  self.bottom, other.top, other.bottom)
+		return Rectangle(left=overlapX[0], right=overlapX[1], top=overlapY[0], bottom=overlapY[1]) if (overlapX and overlapY) is not None else None
 
-		if xOverlap == None or yOverlap == None:
-			return None
-		else:
-			return Rectangle(left=xOverlap[0], right=xOverlap[1], top=yOverlap[0], bottom=yOverlap[1])
 
+
+def overlap(amin, amax, bmin, bmax, key=lambda ln: ln[0]):
+	# TODO: Rename (?)
+	# TODO: Refactor
+	ordered = sorted((amin, amax, bmin, bmax)) #
+	return ordered[1:3] if min(((amin, amax), (bmin, bmax)), key=key) != tuple(ordered[:2]) else None
+	
 
 
 class Maybe(object):
@@ -112,6 +128,7 @@ class Maybe(object):
 		return 'Just {0}'.format(self.value) if self.value is not None else 'Nothing'
 
 
+
 def main():
 	app = tk.Tk()
 	app.title('Intersections')
@@ -123,9 +140,14 @@ def main():
 	rectangles    = []
 	intersections = []
 
+	styles = {
+	 'normal':    {'fill': '#28E031',  'width': 0},
+	 'intersect': {'fill': '#E240B2', 'width': 0}
+	}
 
-	rects = [canvas.create_rectangle((r.left, r.top, r.right, r.bottom), fill='white', width=1) for r in rectangles]
-	inter = [canvas.create_rectangle((r.left, r.top, r.right, r.bottom), fill='orange', width=1) if r is not None else None for r in intersections]
+
+	rects = [canvas.create_rectangle(r.asTuple(), **styles['normal']) for r in rectangles]
+	inter = [canvas.create_rectangle(r.asTuple(), **styles['normal']) if r is not None else None for r in intersections]
 
 	#
 	# TODO: Clean up the input logic (state machine)
@@ -137,14 +159,14 @@ def main():
 
 		r = Rectangle(left=event.x, right=event.x, top=event.y, bottom=event.y)
 		rectangles.append(r) #
-		rects.append(canvas.create_rectangle(r.asTuple(), fill='white', width=1))
+		rects.append(canvas.create_rectangle(r.asTuple(), **styles['normal']))
 
 		transaction['anchor'] = (event.x, event.y)
 
 		if transaction['count'] == 2:
 			r = rectangles[-2].intersect(rectangles[-1])                                                          # 
 			intersections.append(r)                                                                               # 
-			inter.append(canvas.create_rectangle(r.asTuple(), fill='orange', width=1) if r is not None else None) # 
+			inter.append(canvas.create_rectangle(r.asTuple(), **styles['intersect']) if r is not None else None) # 
 
 	def mouseup(event):
 		transaction['drawing'] = False
@@ -164,7 +186,7 @@ def main():
 				elif inter[-1] is not None:
 					canvas.coords(inter[-1], r.asTuple())
 				else:
-					inter[-1] = canvas.create_rectangle(r.asTuple(), fill='orange', width=1)
+					inter[-1] = canvas.create_rectangle(r.asTuple(), **styles['intersect'])
 
 	#
 	app.bind('<1>', mousedown)             # 
