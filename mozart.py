@@ -67,6 +67,8 @@ class Mozart(object):
 		self.playing = False
 
 
+	def record(self):
+		
 	def playback(self):
 		# TODO: This method is haunted
 		# TODO: This method is very inefficient
@@ -126,9 +128,8 @@ def keyToSpeak():
 	app.geometry('{width}x{height}'.format(width=500, height=500))
 
 	img    = Image.open('assets/speechbubble.png')
-	small  = img.thumbnail((64, 64), Image.ANTIALIAS)
-	# print(type(img))
-	# print(type(small))
+	img.thumbnail((64, 64), Image.ANTIALIAS)
+	
 	bubble = ImageTk.PhotoImage(img)
 	label  = tk.Label(image=bubble)
 	# label.pack()
