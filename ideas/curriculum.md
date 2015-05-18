@@ -24,9 +24,9 @@ Examples
   + C bindings
   + Python.org docs
   + Modules
-    ++ A
-    ++ B
-    ++ C
+    + A
+    + B
+    + C
 * classes
   + Class statement
   + inheritance, metaclasses
