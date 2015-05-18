@@ -40,8 +40,9 @@ class Trigger(object):
 
 
 	def trigger(self, position):
-		
+		# TODO: Provide arguments to ontriggered (?)
 		if position in self.bbox:
+			self.ontriggered()
 
 
 		
@@ -84,7 +85,6 @@ class App(object):
 		self.running = False
 
 	def mainloop(self):
-
 		while self.running:
 			event = pygame.event.poll()                      # Poll the event queue
 			self.listeners.get(event.type, self.noop)(event) # Dispatch
