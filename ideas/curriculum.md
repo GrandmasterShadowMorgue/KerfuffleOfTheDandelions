@@ -19,7 +19,7 @@ Examples
   + Comparisons (<, >, <=, >=, ==, !=)
   + Math (*, /, //, +, -, \*\*, %)
   + Augmented assignments (+=, -=, *=, /=, %=)
-  + Bitwise (|, &, <<, >>)
+  + Bitwise (|, &, ^, <<, >>)
   + Identity (is, is not)
   + Contains (in, not in)
   + Boolean (and, or, not)
@@ -38,7 +38,8 @@ Examples
 
 * Statements and syntax
   + if (else, elif), while, for, with, try, except
-  + assert, assignment, continue, break, del, raise
+  + assignment
+  + assert, continue, break, del, raise, yield, pass, return
   + class, def, import
   + nonlocal, global
 
