@@ -48,7 +48,7 @@ Examples
 
 
 * builtin types and functions
-  + str, int, float, complex set, dict, list, tuple
+  + str, int, float, complex, set, dict, list, tuple
 
 
 * modules
@@ -74,6 +74,8 @@ Examples
 
 
 * Functions
-
+  + Starargs, kwargs
+  + Default arguments
+  + Attributes
 
 * \_\_name\_\_ == '\_\_main\_\_'

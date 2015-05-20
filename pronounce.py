@@ -14,7 +14,9 @@
 
 
 
-import pyaudio
+import mozart
+import sqlite3
+
 import queue
 import tkinter as tk
 
@@ -34,12 +36,23 @@ class Pronounce(object):
 
 		'''
 
-		pass
+		#
+		self.size = (700, 420)
+
+		#
+		self.window = tk.Tk()          #
+		self.window.title('Pronounce') #
+		self.window.geometry('{width}x{height}'.format(width=self.size[0], height=self.size[1]))§
+
+
+	def run(self):
+		return self.window.mainloop()
 
 
 
 def main():
-	pass
+	app = Pronounce()
+	app.run()
 
 
 

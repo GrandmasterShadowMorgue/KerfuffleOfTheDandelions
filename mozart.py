@@ -8,7 +8,7 @@
 # Adapted from an example found here (https://people.csail.mit.edu/hubert/pyaudio/)
 
 # TODO | - Implement with coroutines (?)
-#        - 
+#        - Figure out API
 
 # SPEC | -
 #        -
@@ -68,6 +68,12 @@ class Mozart(object):
 
 
 	def record(self):
+		pass
+
+
+	def save(self):
+		pass
+
 		
 	def playback(self):
 		# TODO: This method is haunted
@@ -78,7 +84,7 @@ class Mozart(object):
 				self.stream.write(self.queue.get(), self.CHUNKSIZE)
 
 
-	def read(self, duration, oncomplete):
+	def read(self, duration, oncomplete, consumer=None, async=False):
 		for i in range(0, int(self.SAMPLERATE/self.CHUNKSIZE * duration)):
 			self.queue.put(self.stream.read(self.CHUNKSIZE))
 		oncomplete()
