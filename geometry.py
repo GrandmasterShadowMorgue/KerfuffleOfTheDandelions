@@ -90,7 +90,7 @@ class Rectangle(object):
 
 
 	def asDict(self):
-		return { 'left': self.left, 'right': self.right, 'top': self.top, 'bottom': bottom }
+		return { 'left': self.left, 'right': self.right, 'top': self.top, 'bottom': self.bottom }
 
 
 	def asTuple(self):
@@ -129,6 +129,16 @@ class Maybe(object):
 
 
 
+class StateMachine(object):
+
+	class Node(object):
+		pass
+		
+	def __init__(self):
+		pass
+
+
+
 def main():
 	app = tk.Tk()
 	app.title('Intersections')
@@ -141,7 +151,7 @@ def main():
 	intersections = []
 
 	styles = {
-	 'normal':    {'fill': '#28E031',  'width': 0},
+	 'normal':    {'fill': '#28E031', 'width': 0},
 	 'intersect': {'fill': '#E240B2', 'width': 0}
 	}
 
